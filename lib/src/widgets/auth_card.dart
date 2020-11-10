@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_login/src/libraries/sign_in_button/flutter_signin_button.dart';
 import 'package:provider/provider.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:transformer_page_view/transformer_page_view.dart';
@@ -99,7 +100,8 @@ class AuthCardState extends State<AuthCard> with TickerProviderStateMixin {
     // replace 0 with minPositive to pass the test
     // https://github.com/flutter/flutter/issues/42527#issuecomment-575131275
     _cardOverlayHeightFactorAnimation =
-        Tween<double>(begin: double.minPositive, end: 1.0).animate(CurvedAnimation(
+        Tween<double>(begin: double.minPositive, end: 1.0)
+            .animate(CurvedAnimation(
       parent: _routeTransitionController,
       curve: Interval(.27272727, .5 /* ~250ms */, curve: Curves.linear),
     ));
@@ -540,7 +542,8 @@ class _LoginCardState extends State<_LoginCard> with TickerProviderStateMixin {
     );
   }
 
-  Widget _buildConfirmPasswordField(double width, LoginMessages messages, Auth auth) {
+  Widget _buildConfirmPasswordField(
+      double width, LoginMessages messages, Auth auth) {
     return AnimatedPasswordTextFormField(
       animatedWidth: width,
       enabled: auth.isSignup,
@@ -573,19 +576,22 @@ class _LoginCardState extends State<_LoginCard> with TickerProviderStateMixin {
       child: FlatButton(
         child: Text(
           messages.forgotPasswordButton,
-          style: theme.textTheme.body1,
+          style: theme.textTheme.bodyText2,
           textAlign: TextAlign.left,
         ),
-        onPressed: buttonEnabled ? () {
-          // save state to populate email field on recovery card
-          _formKey.currentState.save();
-          widget.onSwitchRecoveryPassword();
-        } : null,
+        onPressed: buttonEnabled
+            ? () {
+                // save state to populate email field on recovery card
+                _formKey.currentState.save();
+                widget.onSwitchRecoveryPassword();
+              }
+            : null,
       ),
     );
   }
 
-  Widget _buildSubmitButton(ThemeData theme, LoginMessages messages, Auth auth) {
+  Widget _buildSubmitButton(
+      ThemeData theme, LoginMessages messages, Auth auth) {
     return ScaleTransition(
       scale: _buttonScaleAnimation,
       child: AnimatedButton(
@@ -596,7 +602,50 @@ class _LoginCardState extends State<_LoginCard> with TickerProviderStateMixin {
     );
   }
 
-  Widget _buildSwitchAuthButton(ThemeData theme, LoginMessages messages, Auth auth) {
+  Widget _buildProvidersButtons(
+      ThemeData theme, LoginMessages messages, Auth auth) {
+    return Column(
+      children: [
+        SignInButton(
+          Buttons.GoogleDark,
+          text: "Sign in with Google",
+          onPressed: _submit,
+          padding: const EdgeInsets.symmetric(
+            vertical: 10.0,
+            horizontal: 25.0,
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(50.0),
+          ),
+          width: MediaQuery.of(context).size.width * 2 / 3,
+          iconSize: 30,
+          height: 40.0,
+        ),
+        SizedBox(height: 15),
+        ScaleTransition(
+          scale: _buttonScaleAnimation,
+          child: SignInButton(
+            Buttons.AppleDark,
+            text: "Sign in with Apple",
+            onPressed: _submit,
+            padding: const EdgeInsets.symmetric(
+              vertical: 10.0,
+              horizontal: 25.0,
+            ),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(50.0),
+            ),
+            width: MediaQuery.of(context).size.width * 2 / 3,
+            iconSize: 30,
+            height: 40.0,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSwitchAuthButton(
+      ThemeData theme, LoginMessages messages, Auth auth) {
     return FadeIn(
       controller: _loadingController,
       offset: .5,
@@ -670,6 +719,7 @@ class _LoginCardState extends State<_LoginCard> with TickerProviderStateMixin {
               children: <Widget>[
                 _buildForgotPassword(theme, messages),
                 _buildSubmitButton(theme, messages, auth),
+                _buildProvidersButtons(theme, messages, auth),
                 _buildSwitchAuthButton(theme, messages, auth),
               ],
             ),
@@ -755,7 +805,8 @@ class _RecoverCardState extends State<_RecoverCard>
     }
   }
 
-  Widget _buildRecoverNameField(double width, LoginMessages messages, Auth auth) {
+  Widget _buildRecoverNameField(
+      double width, LoginMessages messages, Auth auth) {
     return AnimatedTextFormField(
       controller: _nameController,
       width: width,
@@ -780,10 +831,12 @@ class _RecoverCardState extends State<_RecoverCard>
   Widget _buildBackButton(ThemeData theme, LoginMessages messages) {
     return FlatButton(
       child: Text(messages.goBackButton),
-      onPressed: !_isSubmitting ? () {
-        _formRecoverKey.currentState.save();
-        widget.onSwitchLogin();
-      } : null,
+      onPressed: !_isSubmitting
+          ? () {
+              _formRecoverKey.currentState.save();
+              widget.onSwitchLogin();
+            }
+          : null,
       padding: EdgeInsets.symmetric(horizontal: 30.0, vertical: 4),
       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
       textColor: theme.primaryColor,
@@ -820,7 +873,7 @@ class _RecoverCardState extends State<_RecoverCard>
                   messages.recoverPasswordIntro,
                   key: kRecoverPasswordIntroKey,
                   textAlign: TextAlign.center,
-                  style: theme.textTheme.body1,
+                  style: theme.textTheme.bodyText2,
                 ),
                 SizedBox(height: 20),
                 _buildRecoverNameField(textFieldWidth, messages, auth),
@@ -829,7 +882,7 @@ class _RecoverCardState extends State<_RecoverCard>
                   messages.recoverPasswordDescription,
                   key: kRecoverPasswordDescriptionKey,
                   textAlign: TextAlign.center,
-                  style: theme.textTheme.body1,
+                  style: theme.textTheme.bodyText2,
                 ),
                 SizedBox(height: 26),
                 _buildRecoverButton(theme, messages),
